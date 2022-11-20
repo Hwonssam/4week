@@ -16,9 +16,13 @@
   <div id="app">
     <div class="text-center my-10">
       <a class="btn btn-ghost normal-case text-5xl">당신의 고백은 성공할 수 있을까요?</a>
+      <div class="flex justify-center p-7">
+        <img src="https://31.media.tumblr.com/35eb17a0fac3f0b61915ee0ebdc36ea3/tumblr_nskcgvwA4N1rrkk9fo2_500.gif
+      " alt="answer" width="300" />
+      </div>
     </div>
     <div class="flex justify-center">
-      <button @click="askAnswer" class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg ">결과보기</button>
+      <button @click="askAnswer" class="btn  btn btn-primary btn-xs sm:btn-sm md:btn-md lg:btn-lg ">결과보기</button>
     </div>
     <div class="divider my-10">결과</div>
     <div v-show="기다리는중" class="text-center">
