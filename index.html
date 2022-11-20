@@ -1,310 +1,61 @@
 <!DOCTYPE html>
-<html data-theme="pastel" lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>가위바위보</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/daisyui@2.38.1/dist/full.css"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
+<html data-theme="cupcake" lang="ko">
 
-    <style>
-      img {
-        height: 200px;
-        width: 200px;
-      }
-      #startgame {
-        height: 50px;
-      }
-      .container {
-        justify-content: center;
-        flex-wrap: wrap;
-        padding: 40px;
-      }
-      .container > div {
-        margin: 20px;
-      }
-    </style>
-  </head>
-  <!--여기부터 바디 -->
-  <body>
-    <div class="navbar bg-base-300">
-      <a class="btn btn-ghost normal-case text-xl">가위바위보게임</a>
-    </div>
-    <!--게임방법 설명-->
-    <div
-      tabindex="0"
-      class="collapse border border-base-300 bg-base-100 rounded-box"
-    >
-      <div class="collapse-title text-xl font-medium text-center">게임방법</div>
-      <div class="collapse-content font-medium text-center">
-        <p>1.가위바위보 중 하나를 선택하여 누른다..</p>
-        <p>2.다시하기 버튼을 눌러 컴퓨터를 이겨보자.</p>
-        <p>3.5승을 먼저 달성하면 승리!</p>
-      </div>
-    </div>
-    <div
-      tabindex="0"
-      class="collapse border border-base-300 bg-base-100 rounded-box"
-    >
-      <div
-        id="startgame"
-        class="collapse-title text-xl font-medium text-center"
-      ></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>고백공격</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@2.39.0/dist/full.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
 
-      <!--가위바위보 선택박스-->
-      <div id="choose_boxs" class="container flex">
-        <div class="card w-96 bg-base-100 shadow-xl">
-          <figure>
-            <img
-              src="http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/rock.png"
-            />
-          </figure>
-          <div class="card-body h-40">
-            <button
-              id="choose1"
-              class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg"
-            >
-              선택하기
-            </button>
-          </div>
-        </div>
-        <div class="card w-96 bg-base-100 shadow-xl">
-          <figure>
-            <img
-              src="http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/paper.png"
-            />
-          </figure>
-          <div class="card-body">
-            <button
-              id="choose2"
-              class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg"
-            >
-              선택하기
-            </button>
-          </div>
-        </div>
-        <div class="card w-96 bg-base-100 shadow-xl">
-          <figure>
-            <img
-              src="http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/scissor.png"
-              alt="Shoes"
-            />
-          </figure>
-          <div class="card-body">
-            <button
-              id="choose3"
-              class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg"
-            >
-              선택하기
-            </button>
-          </div>
-        </div>
+<body>
+  <div id="app">
+    <div class="text-center my-10">
+      <a class="btn btn-ghost normal-case text-5xl">당신의 고백은 성공할 수 있을까요?</a>
+    </div>
+    <div class="flex justify-center">
+      <button @click="askAnswer" class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg ">결과보기</button>
+    </div>
+    <div class="divider my-10">결과</div>
+    <div v-show="기다리는중" class="text-center">
+      <a class="btn btn-ghost normal-case text-5xl">기다리는중(2초)</a>
+    </div>
+    <div v-show="!기다리는중" class="text-center">
+      <div class="text-6xl text-primary">{{ answer }}</div>
+      <div class="flex justify-center my-10">
+        <img :src="image" :alt="answer" width="300" />
       </div>
     </div>
-    <div class="h-10"></div>
-    <!--결과창-->
-    <div id="comwin_result" class="justify-center hidden">
-      <div></div>
-      <div>
-        <a class="btn content-center btn-ghost normal-case text-6xl"
-          >당신은 컴퓨터에게 패배해버렸습니다...</a
-        >
-      </div>
-      <div></div>
-      <div></div>
-    </div>
-    <div id="mywin_result" class="justify-center hidden">
-      <div></div>
-      <div>
-        <a class="btn content-center btn-ghost normal-case text-6xl"
-          >당신은 이세돌9단의 복수를 이루었습니다!!</a
-        >
-      </div>
-      <div></div>
-      <div></div>
-    </div>
-    <!--가위바위보 결과 및 다시하기창-->
-    <div id="choosed_box" class="container hidden">
-      <div class="card w-96 bg-base-100 shadow-xl">
-        <a id="mywin" class="btn btn-ghost normal-case text-4xl">1승</a>
-        <figure>
-          <img id="mychoose" src="" />
-        </figure>
-        <div class="card-body h-40">
-          <button
-            class="btn btn-secondary btn-xs sm:btn-sm md:btn-md lg:btn-lg"
-          >
-            나의 선택
-          </button>
-        </div>
-      </div>
-      <figure>
-        <img
-          src="https://images.fineartamerica.com/images/artworkimages/mediumlarge/2/versus-crbn-dsgn.jpg"
-        />
-      </figure>
-      <div class="card w-96 bg-base-100 shadow-xl">
-        <a id="comwin" class="btn btn-ghost normal-case text-4xl">1승</a>
-        <figure>
-          <img
-            id="comchoose"
-            src="http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/paper.png"
-          />
-        </figure>
-        <div class="card-body">
-          <button
-            class="btn btn-secondary btn-xs sm:btn-sm md:btn-md lg:btn-lg"
-          >
-            컴퓨터의 선택
-          </button>
-        </div>
-      </div>
-      <div class="absolute self-center items-bottom">
-        <button
-          id="regame"
-          class="place-content-center btn btn-xs sm:btn-sm md:btn-md lg:btn-lg"
-        >
-          다시하기
-        </button>
-      </div>
-    </div>
+  </div>
+</body>
 
-    <script>
-      const choose_1 = document.getElementById("choose1");
-      const choose_2 = document.getElementById("choose2");
-      const choose_3 = document.getElementById("choose3");
-      const choose_box = document.getElementById("choose_boxs");
-      const choosed_box = document.getElementById("choosed_box");
-      const mychoose = document.getElementById("mychoose");
-      const comchoose = document.getElementById("comchoose");
-      const my_win = document.getElementById("mywin");
-      const com_win = document.getElementById("comwin");
-      const re_game = document.getElementById("regame");
-      const com_win_result = document.getElementById("comwin_result");
-      const my_win_result = document.getElementById("mywin_result");
-      //승수를 나타냅니다.
-      let mywin_num = 0;
-      let comwin_num = 0;
-      //선택후 컴퓨터에는 난수를 부여해 랜덤으로 가위바위보를 띄웁니다.
-      function afterChoose() {
-        choose_box.classList.remove("flex");
-        choose_box.classList.add("hidden");
-        choosed_box.classList.remove("hidden");
-        choosed_box.classList.add("flex");
-        let com_num = Math.floor(Math.random() * 3) + 1;
-
-        if (com_num == 1) {
-          comchoose.setAttribute(
-            "src",
-            "http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/rock.png"
-          );
-        } else if (com_num == 2) {
-          comchoose.setAttribute(
-            "src",
-            "http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/paper.png"
-          );
-        } else {
-          comchoose.setAttribute(
-            "src",
-            "http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/scissor.png"
-          );
-        }
-      }
-      //5승후 결과창울 띄웁니다.
-      function showResultBox() {
-        if (comwin_num > 4 || (mywin_num > 4 && mywin_num != comwin_num)) {
-          if (comwin_num > mywin_num) {
-            my_win_result.classList.remove("flex");
-            my_win_result.classList.add("hidden");
-            com_win_result.classList.remove("hidden");
-            com_win_result.classList.add("flex");
-          } else {
-            com_win_result.classList.remove("flex");
-            com_win_result.classList.add("hidden");
-            my_win_result.classList.remove("hidden");
-            my_win_result.classList.add("flex");
-          }
-        }
-      }
-      //다시하기 버튼 활성화
-      function regame() {
-        choosed_box.classList.remove("flex");
-        choosed_box.classList.add("hidden");
-        choose_box.classList.remove("hidden");
-        choose_box.classList.add("flex");
-      }
-      //내가 고른 것에 따라 나의 선택의 이미지를 바꾸고 결과를 나타냅니다.
-      //이미지 주소에서 컴퓨터의 선택은 무엇인지에 따라 승수를 추가합니다.
-      function rock() {
-        mychoose.setAttribute(
-          "src",
-          "http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/rock.png"
-        );
-        let x = comchoose.getAttribute("src").slice(-11, -1);
-        if (x.indexOf("scissor") > -1) {
-          mywin_num += 1;
-        } else if (x.indexOf("paper") > -1) {
-          comwin_num += 1;
-        }
-        showResultBox();
-        my_win.innerText = String(mywin_num) + "승";
-        com_win.innerText = String(comwin_num) + "승";
-        if (x.indexOf("rock") > -1) {
-          my_win.innerText = "무승부";
-          com_win.innerText = "무승부";
-        }
-      }
-      function paper() {
-        mychoose.setAttribute(
-          "src",
-          "http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/paper.png"
-        );
-        let x = comchoose.getAttribute("src").slice(-11, -1);
-        if (x.indexOf("scissor") > -1) {
-          comwin_num += 1;
-        } else if (x.indexOf("rock") > -1) {
-          mywin_num += 1;
-        }
-        showResultBox();
-        my_win.innerText = String(mywin_num) + "승";
-        com_win.innerText = String(comwin_num) + "승";
-        if (x.indexOf("paper") > -1) {
-          my_win.innerText = "무승부";
-          com_win.innerText = "무승부";
-        }
-      }
-      function scissor() {
-        mychoose.setAttribute(
-          "src",
-          "http://jhnsoft.dothome.co.kr/rock-paper-scissors/img/scissor.png"
-        );
-        let x = comchoose.getAttribute("src").slice(-11, -1);
-        if (x.indexOf("paper") > -1) {
-          mywin_num += 1;
-        } else if (x.indexOf("rock") > -1) {
-          comwin_num += 1;
-        }
-        showResultBox();
-        my_win.innerText = String(mywin_num) + "승";
-        com_win.innerText = String(comwin_num) + "승";
-        if (x.indexOf("scissor") > -1) {
-          my_win.innerText = "무승부";
-          com_win.innerText = "무승부";
-        }
-      }
-      //이벤트창
-      choose_1.addEventListener("click", afterChoose);
-      choose_1.addEventListener("click", rock);
-      choose_2.addEventListener("click", afterChoose);
-      choose_2.addEventListener("click", paper);
-      choose_3.addEventListener("click", afterChoose);
-      choose_3.addEventListener("click", scissor);
-      re_game.addEventListener("click", regame);
-    </script>
-  </body>
 </html>
+
+<script>
+  const { createApp } = Vue;
+  createApp({
+    data() {
+      return {
+        기다리는중: false,
+        answer: "",
+        image: "",
+      };
+    },
+    methods: {
+      askAnswer() {
+        this.기다리는중 = true;
+        axios
+          .get("https://yesno.wtf/api")
+          .then((response) => {
+            setTimeout(() => (this.기다리는중 = false), 1300);
+            this.answer = response.data.answer;
+            this.image = response.data.image;
+          })
+      },
+    },
+  }).mount("#app");
+</script>
